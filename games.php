@@ -1,6 +1,13 @@
 <?php 
 session_start();
-include 'config.php'; 
+include 'config.php';
+
+$games = mysqli_query($conn,"
+  SELECT games.*, users.name AS publisher
+  FROM games
+  LEFT JOIN users ON games.user_id = users.id
+  ORDER BY games.id DESC
+");
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +29,25 @@ include 'config.php';
   </nav>
 
   <div class="nav-right">
-    <a href="game_form.php" class="btn">+ Add</a>
+
+    <?php if(isset($_SESSION['user'])) { ?>
+      <span class="nav-user">👋 <?= $_SESSION['user']['name']; ?></span>
+      <a href="logout.php" class="btn-outline">Logout</a>
+    <?php } else { ?>
+      <a href="login.php" class="btn-outline">Login</a>
+    <?php } ?>
+
+    <!-- ADD DROPDOWN -->
+    <?php if(isset($_SESSION['user'])) { ?>
+    <div class="dropdown" id="addMenu">
+      <button class="btn" onclick="toggleDropdown()">+ Add ▾</button>
+      <div class="dropdown-menu">
+        <a href="game_form.php">🎮 Add Game</a>
+        <a href="merch_form.php">🛍 Add Merch</a>
+      </div>
+    </div>
+    <?php } ?>
+
   </div>
 </div>
 
@@ -30,29 +55,53 @@ include 'config.php';
 
   <div class="page-header">
     <h2>All Games</h2>
-    <p>Browse Indonesian games 🎮</p>
   </div>
 
   <div class="grid">
-    <?php
-    $result = mysqli_query($conn, "SELECT * FROM games");
 
-    if(mysqli_num_rows($result) == 0){
-      echo "<p>No games found.</p>";
-    }
+  <?php while($g = mysqli_fetch_assoc($games)) { ?>
+    <div class="card">
 
-    while($g = mysqli_fetch_assoc($result)) {
-    ?>
-      <div class="card">
-        <img src="uploads/<?php echo $g['image']; ?>">
-        <h3><?php echo $g['title']; ?></h3>
-        <p><?php echo $g['genre']; ?></p>
-        <a class="btn" href="game_detail.php?id=<?php echo $g['id']; ?>">Detail</a>
-      </div>
-    <?php } ?>
+      <img src="uploads/<?= $g['image']; ?>">
+
+      <h3><?= $g['title']; ?></h3>
+      <p><?= $g['genre']; ?></p>
+      <p style="color:#94a3b8;font-size:13px;">
+        👤 <?= $g['publisher'] ?? 'Unknown'; ?>
+      </p>
+
+      <a class="btn" href="game_detail.php?id=<?= $g['id']; ?>">Detail</a>
+
+      <!-- OWNER ONLY -->
+      <?php if(isset($_SESSION['user']) && $_SESSION['user']['id'] == $g['user_id']) { ?>
+        <a href="game_form.php?id=<?= $g['id']; ?>" class="btn">Edit</a>
+
+        <a href="game_action.php?delete=<?= $g['id']; ?>"
+           class="btn"
+           onclick="return confirm('Delete this game?')">
+           Delete
+        </a>
+      <?php } ?>
+
+    </div>
+  <?php } ?>
+
   </div>
 
 </div>
+
+<script>
+function toggleDropdown(){
+  document.getElementById("addMenu").classList.toggle("active");
+}
+
+document.addEventListener("click", function(e){
+  const menu = document.getElementById("addMenu");
+  if(menu && !menu.contains(e.target)){
+    menu.classList.remove("active");
+  }
+});
+</script>
 
 </body>
 </html>

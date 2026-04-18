@@ -2,6 +2,7 @@
 session_start();
 include 'config.php'; 
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,19 +12,17 @@ include 'config.php';
 
 <body>
 
-<!-- NAVBAR -->
 <div class="header">
-  <div class="logo">GimList</div>
+  <div class="logo">🎮 GimList</div>
 
   <nav class="nav-center">
     <a href="index.php#games">Games</a>
-    <a href="index.php#merch">Merch</a>
-    <a href="index.php#add">Submit</a>
+    <a href="merch.php" class="active">Merch</a>
   </nav>
 
   <div class="nav-right">
     <?php if(isset($_SESSION['user'])) { ?>
-      <span>👋 <?php echo $_SESSION['user']['name']; ?></span>
+      <span class="nav-user">👋 <?= $_SESSION['user']['name']; ?></span>
       <a href="logout.php" class="btn-outline">Logout</a>
     <?php } else { ?>
       <a href="login.php" class="btn-outline">Login</a>
@@ -31,10 +30,9 @@ include 'config.php';
   </div>
 </div>
 
-<!-- CONTENT -->
 <div class="container">
 
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+  <div style="display:flex; justify-content:space-between;">
     <h1>🛍 Merchandise</h1>
 
     <?php if(isset($_SESSION['user'])) { ?>
@@ -43,42 +41,48 @@ include 'config.php';
   </div>
 
   <div class="grid">
+
   <?php
   $q = $conn->query("
-    SELECT merch.*, games.title AS game, categories.name AS category
+    SELECT merch.*, users.name AS publisher,
+           games.title AS game
     FROM merch
-    JOIN games ON merch.game_id = games.id
-    JOIN categories ON merch.category_id = categories.id
+    LEFT JOIN users ON merch.user_id = users.id
+    LEFT JOIN games ON merch.game_id = games.id
   ");
 
   while($row = $q->fetch_assoc()):
   ?>
+
     <div class="card">
 
       <img src="uploads/<?= $row['image'] ?>">
 
       <h3><?= $row['name'] ?></h3>
-      <p><?= $row['game'] ?> • <?= $row['category'] ?></p>
+      <p><?= $row['game'] ?></p>
 
-      <!-- ACTIONS -->
-      <div style="margin-top:10px;">
-        <a href="game_detail.php?id=<?= $row['game_id'] ?>" class="btn">Game</a>
+      <p style="color:#94a3b8;font-size:13px;">
+        👤 <?= $row['publisher']; ?>
+      </p>
 
-        <?php if(isset($_SESSION['user'])) { ?>
-          <a href="merch_form.php?id=<?= $row['id'] ?>" class="btn">Edit</a>
+      <a href="game_detail.php?id=<?= $row['game_id'] ?>" class="btn">Game</a>
 
-          <a href="merch_action.php?delete=<?= $row['id'] ?>"
-             class="btn"
-             onclick="return confirm('Delete this merch?')">
-             Delete
-          </a>
-        <?php } ?>
-      </div>
+      <!-- OWNER ONLY -->
+      <?php if(isset($_SESSION['user']) && $_SESSION['user']['id'] == $row['user_id']) { ?>
+        <a href="merch_form.php?id=<?= $row['id'] ?>" class="btn">Edit</a>
+
+        <a href="merch_action.php?delete=<?= $row['id'] ?>"
+           class="btn"
+           onclick="return confirm('Delete this merch?')">
+           Delete
+        </a>
+      <?php } ?>
 
     </div>
-  <?php endwhile; ?>
-  </div>
 
+  <?php endwhile; ?>
+
+  </div>
 </div>
 
 </body>

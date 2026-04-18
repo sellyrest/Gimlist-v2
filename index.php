@@ -2,7 +2,14 @@
 session_start();
 include 'config.php';
 
-$games = mysqli_query($conn, "SELECT * FROM games ORDER BY id DESC");
+$games = mysqli_query($conn,"
+  SELECT games.*, users.name AS publisher
+  FROM games
+  LEFT JOIN users ON games.user_id = users.id
+  ORDER BY games.id DESC
+  LIMIT 10
+");
+
 $merch = mysqli_query($conn, "SELECT * FROM merch ORDER BY id DESC LIMIT 6");
 ?>
 
@@ -39,12 +46,34 @@ $merch = mysqli_query($conn, "SELECT * FROM merch ORDER BY id DESC LIMIT 6");
   <div class="logo">🎮 GimList</div>
 
   <nav class="nav-center">
-    <a href="#games">Games</a>
-    <a href="#merch">Merch</a>
+    <a href="games.php">Games</a>
+    <a href="merch.php">Merch</a>
   </nav>
 
   <div class="nav-right">
-    <a href="game_form.php" class="btn">+ Add</a>
+
+    <?php if(isset($_SESSION['user'])) { ?>
+      
+      <span style="color:#94a3b8;">
+        👋 <?= $_SESSION['user']['name']; ?>
+      </span>
+
+      <a href="logout.php" class="btn-outline">Logout</a>
+
+    <?php } else { ?>
+
+      <a href="login.php" class="btn-outline">Login</a>
+
+    <?php } ?>
+
+    <div class="dropdown" id="addMenu">
+      <button class="btn" onclick="toggleDropdown()">+ Add ▾</button>
+      <div class="dropdown-menu">
+        <a href="game_form.php">🎮 Add Game</a>
+        <a href="merch_form.php">🛍 Add Merch</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -74,10 +103,21 @@ $merch = mysqli_query($conn, "SELECT * FROM merch ORDER BY id DESC LIMIT 6");
       <?php while($g = mysqli_fetch_assoc($games)) { ?>
         <div class="slide">
           <div class="card">
-            <img src="uploads/<?php echo $g['image']; ?>">
-            <h3><?php echo $g['title']; ?></h3>
-            <p><?php echo $g['genre']; ?></p>
-            <a href="game_detail.php?id=<?php echo $g['id']; ?>" class="btn">View</a>
+
+          <?php if(!empty($g['image'])): ?>
+            <img src="uploads/<?= htmlspecialchars($g['image']); ?>">
+            <?php else: ?>
+              <img src="uploads/default.jpg">
+              <?php endif; ?>
+
+            <h3><?= htmlspecialchars($g['title']); ?></h3>
+            <p><?= htmlspecialchars($g['genre']); ?></p>
+
+            <p style="color:#94a3b8;font-size:13px;">
+              👤 <?= htmlspecialchars($g['publisher']); ?>
+            </p>
+
+            <a href="game_detail.php?id=<?= $g['id']; ?>" class="btn">View</a>
           </div>
         </div>
       <?php } ?>
@@ -126,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
     track.style.transform = `translateX(-${index * slideWidth}px)`;
   }
 
-  // ✅ NOW 3 SECONDS
+
   interval = setInterval(moveSlide, 3000);
 
   // pause on hover
@@ -138,6 +178,16 @@ document.addEventListener("DOMContentLoaded", function () {
     interval = setInterval(moveSlide, 3000);
   });
 
+});
+function toggleDropdown(){
+  document.getElementById("addMenu").classList.toggle("active");
+}
+
+document.addEventListener("click", function(e){
+  const menu = document.getElementById("addMenu");
+  if(!menu.contains(e.target)){
+    menu.classList.remove("active");
+  }
 });
 </script>
 
