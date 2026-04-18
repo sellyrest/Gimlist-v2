@@ -1,10 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+$conn = mysqli_connect("localhost", "root", "", "gimlist");
 
-$conn = new mysqli("localhost", "root", "", "gimlist");
-
-if ($conn->connect_error) {
-    die("DB ERROR: " . $conn->connect_error);
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
 }
+
+session_start();
 ?>

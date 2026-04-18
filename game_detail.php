@@ -1,42 +1,55 @@
-<?php include 'config.php';
-$id=$_GET['id'];
+<?php
+session_start(); // keep session if you want user info
+include 'config.php';
 
-$game=$conn->query("SELECT * FROM games WHERE id=$id")->fetch_assoc();
-
-$merch=$conn->query("
-SELECT merch.*, categories.name AS category
-FROM merch
-JOIN categories ON merch.category_id=categories.id
-WHERE merch.game_id=$id
-");
+$id = $_GET['id'];
+$res = mysqli_query($conn,"SELECT * FROM games WHERE id=$id");
+$g = mysqli_fetch_assoc($res);
 ?>
-<link rel="stylesheet" href="style.css">
+
+<!DOCTYPE html>
+<html>
+<head>
+<title><?php echo $g['title']; ?> - GimList</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="header">
+  <div class="logo">🎮 GimList</div>
+
+  <nav class="nav-center">
+    <a href="index.php">Home</a>
+    <a href="games.php">Games</a>
+    <a href="merch.php">Merch</a>
+  </nav>
+
+  <div class="nav-right">
+    <?php if(isset($_SESSION['user'])) { ?>
+      <span>👋 <?php echo $_SESSION['user']['name']; ?></span>
+      <a href="logout.php" class="btn-outline">Logout</a>
+    <?php } else { ?>
+      <a href="login.php" class="btn-outline">Login</a>
+    <?php } ?>
+  </div>
+</div>
 
 <div class="container">
 
-<h1><?= $game['title'] ?></h1>
+  <div class="card" style="max-width:600px; margin:auto;">
 
-<img src="uploads/<?= $game['image'] ?>" width="300">
+    <img src="uploads/<?php echo $g['image']; ?>">
 
-<p><?= $game['developer'] ?></p>
-<p><?= $game['genre'] ?></p>
+    <h2><?php echo $g['title']; ?></h2>
 
-<a href="merch_form.php?game_id=<?= $id ?>" class="btn">+ Add Merch</a>
+    <p><b>Genre:</b> <?php echo $g['genre']; ?></p>
+    <p><b>Developer:</b> <?php echo $g['developer']; ?></p>
 
-<?php if($merch->num_rows>0): ?>
-<h2>🛍 Related Merch</h2>
+  </div>
 
-<div class="merch-grid">
-<?php while($m=$merch->fetch_assoc()): ?>
-<div class="merch-card">
-    <img src="uploads/<?= $m['image'] ?>">
-    <h4><?= $m['name'] ?></h4>
-    <p><?= $m['category'] ?></p>
-    <p>Rp<?= number_format($m['price']) ?></p>
 </div>
-<?php endwhile; ?>
-</div>
-<?php endif; ?>
 
-<a href="games.php" class="btn">Back</a>
-</div>
+</body>
+</html>

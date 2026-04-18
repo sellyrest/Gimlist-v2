@@ -1,3 +1,4 @@
+<?php include 'auth.php'; ?>
 <?php include 'config.php';
 
 $id=$_GET['id']??null;
@@ -5,7 +6,7 @@ if($id){
 $data=$conn->query("SELECT * FROM merch WHERE id=$id")->fetch_assoc();
 }
 ?>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/assets/style.css">
 
 <form action="merch_action.php" method="POST" enctype="multipart/form-data" class="container">
 

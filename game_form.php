@@ -1,22 +1,20 @@
-<?php include 'config.php';
-$id = $_GET['id'] ?? null;
-if ($id) {
-    $data = $conn->query("SELECT * FROM games WHERE id=$id")->fetch_assoc();
-}
-?>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/style.css">
 
-<form action="game_action.php" method="POST" enctype="multipart/form-data" class="container">
-<h2><?= $id ? "Edit Game" : "Add Game" ?></h2>
+<div class="header">
+  <div class="logo">🎮 GimList</div>
+</div>
 
-<input type="hidden" name="id" value="<?= $id ?>">
+<div class="container">
+  <h2>Add Game</h2>
 
-<input name="title" placeholder="Title" value="<?= $data['title'] ?? '' ?>">
-<input name="developer" placeholder="Developer" value="<?= $data['developer'] ?? '' ?>">
-<input name="genre" placeholder="Genre" value="<?= $data['genre'] ?? '' ?>">
-<input name="year" placeholder="Year" value="<?= $data['release_year'] ?? '' ?>">
+  <form class="form-box" method="POST" action="game_action.php" enctype="multipart/form-data">
+  <input type="text" name="title" placeholder="Title" required>
+  <input type="text" name="developer" placeholder="Developer">
+  <input type="text" name="genre" placeholder="Genre">
+  <input type="number" name="year" placeholder="Year">
 
-<input type="file" name="image">
+  <input type="file" name="image" accept="image/*" required>
 
-<button class="btn"><?= $id ? "Update" : "Create" ?></button>
+  <button class="btn">Submit</button>
 </form>
+</div>

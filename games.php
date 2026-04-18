@@ -1,24 +1,58 @@
-<?php include 'config.php'; ?>
-<link rel="stylesheet" href="style.css">
+<?php 
+session_start();
+include 'config.php'; 
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Games - GimList</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">🎮 GimList</div>
+
+  <nav class="nav-center">
+    <a href="index.php">Home</a>
+    <a href="games.php" class="active">Games</a>
+    <a href="merch.php">Merch</a>
+  </nav>
+
+  <div class="nav-right">
+    <a href="game_form.php" class="btn">+ Add</a>
+  </div>
+</div>
 
 <div class="container">
-<h1>🎮 Games</h1>
-<a href="game_form.php" class="btn">+ Add Game</a>
 
-<div class="game-row">
-<?php
-$result = $conn->query("SELECT * FROM games ORDER BY id DESC");
-while($row = $result->fetch_assoc()):
-?>
-<div class="game-card">
-    <img src="uploads/<?= $row['image'] ?>">
-    <h5><?= $row['title'] ?></h5>
-    <p><?= $row['genre'] ?> • <?= $row['release_year'] ?></p>
+  <div class="page-header">
+    <h2>All Games</h2>
+    <p>Browse Indonesian games 🎮</p>
+  </div>
 
-    <a href="game_detail.php?id=<?= $row['id'] ?>" class="btn">View</a>
-    <a href="game_form.php?id=<?= $row['id'] ?>" class="btn">Edit</a>
-    <a href="game_action.php?delete=<?= $row['id'] ?>" class="btn">Delete</a>
+  <div class="grid">
+    <?php
+    $result = mysqli_query($conn, "SELECT * FROM games");
+
+    if(mysqli_num_rows($result) == 0){
+      echo "<p>No games found.</p>";
+    }
+
+    while($g = mysqli_fetch_assoc($result)) {
+    ?>
+      <div class="card">
+        <img src="uploads/<?php echo $g['image']; ?>">
+        <h3><?php echo $g['title']; ?></h3>
+        <p><?php echo $g['genre']; ?></p>
+        <a class="btn" href="game_detail.php?id=<?php echo $g['id']; ?>">Detail</a>
+      </div>
+    <?php } ?>
+  </div>
+
 </div>
-<?php endwhile; ?>
-</div>
-</div>
+
+</body>
+</html>
