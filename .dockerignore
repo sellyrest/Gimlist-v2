@@ -1,0 +1,49 @@
+# Version control
+.git
+.gitignore
+
+# Secret
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies
+node_modules
+vendor
+venv
+.venv
+env
+
+# Cache and logs
+__pycache__
+*.pyc
+.cache
+*.log
+logs
+tmp
+
+# Build outputs
+dist
+build
+coverage
+
+# Local data and dumps
+*.sql
+*.sqlite
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+compose*.yaml
+.dockerignore
+
+# Editor and OS junk
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docs
+README.md
