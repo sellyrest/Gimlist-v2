@@ -83,6 +83,7 @@ $merch = mysqli_query($conn, "SELECT * FROM merch ORDER BY id DESC LIMIT 6");
     <h1>Discover Indonesian Games</h1>
     <p>Explore local creativity 🎮</p>
     <a href="#games" class="btn">Explore</a>
+    <a href="#merch" class="btn">Merch</a>
   </div>
 
   <div class="hero-img">
